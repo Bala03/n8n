@@ -1,0 +1,198 @@
+{
+  "name": "TradingView Market Analysis Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "validation",
+        "operation": "validate"
+      },
+      "id": "session-validation",
+      "name": "Validate TradingView Session",
+      "type": "n8n-nodes-base.tradingView",
+      "position": [200, 300],
+      "credentials": {
+        "tradingViewApi": {
+          "id": "tradingview-credentials",
+          "name": "TradingView API Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "overview",
+        "operation": "get"
+      },
+      "id": "market-overview",
+      "name": "Get Market Overview",
+      "type": "n8n-nodes-base.tradingView",
+      "position": [400, 200],
+      "credentials": {
+        "tradingViewApi": {
+          "id": "tradingview-credentials",
+          "name": "TradingView API Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "scanner", 
+        "operation": "gainers",
+        "market": "america",
+        "limit": 25,
+        "columns": [
+          "name",
+          "close", 
+          "change",
+          "change_abs",
+          "volume",
+          "market_cap_basic"
+        ]
+      },
+      "id": "top-gainers",
+      "name": "Get Top Gainers",
+      "type": "n8n-nodes-base.tradingView",
+      "position": [600, 100],
+      "credentials": {
+        "tradingViewApi": {
+          "id": "tradingview-credentials",
+          "name": "TradingView API Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "scanner",
+        "operation": "scan", 
+        "market": "america",
+        "limit": 50,
+        "columns": [
+          "name",
+          "close",
+          "volume", 
+          "market_cap_basic",
+          "price_earnings_ttm"
+        ],
+        "sortBy": "market_cap_basic",
+        "useCustomFilters": true,
+        "filters": {
+          "filter": [
+            {
+              "left": "market_cap_basic",
+              "operation": "greater",
+              "right": "10000000000"
+            },
+            {
+              "left": "volume",
+              "operation": "greater", 
+              "right": "1000000"
+            },
+            {
+              "left": "price_earnings_ttm",
+              "operation": "less",
+              "right": "25"
+            }
+          ]
+        }
+      },
+      "id": "custom-scan",
+      "name": "Large Cap Value Stocks",
+      "type": "n8n-nodes-base.tradingView",
+      "position": [800, 200],
+      "credentials": {
+        "tradingViewApi": {
+          "id": "tradingview-credentials", 
+          "name": "TradingView API Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "marketData",
+        "operation": "getAll"
+      },
+      "id": "all-markets",
+      "name": "Get All Markets Data",
+      "type": "n8n-nodes-base.tradingView", 
+      "position": [600, 300],
+      "credentials": {
+        "tradingViewApi": {
+          "id": "tradingview-credentials",
+          "name": "TradingView API Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.sessionValid}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check-session",
+      "name": "Check Session Valid",
+      "type": "n8n-nodes-base.if",
+      "position": [300, 300]
+    }
+  ],
+  "connections": {
+    "Validate TradingView Session": {
+      "main": [
+        [
+          {
+            "node": "Check Session Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Session Valid": {
+      "main": [
+        [
+          {
+            "node": "Get Market Overview", 
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Markets Data",
+            "type": "main", 
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Market Overview": {
+      "main": [
+        [
+          {
+            "node": "Get Top Gainers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Top Gainers": {
+      "main": [
+        [
+          {
+            "node": "Large Cap Value Stocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "meta": {
+    "version": "1",
+    "description": "Comprehensive TradingView market analysis workflow demonstrating all node capabilities",
+    "tags": ["trading", "finance", "market-data", "stocks"]
+  }
+}
