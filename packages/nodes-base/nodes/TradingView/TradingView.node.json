@@ -1,0 +1,20 @@
+{
+	"node": "n8n-nodes-base.tradingView",
+	"nodeVersion": "1.0",
+	"codex": {
+		"categories": ["Finance", "Data & Storage", "Development"],
+		"subcategories": {
+			"Finance": ["Trading", "Market Data"],
+			"Data & Storage": ["Read"],
+			"Development": ["API"]
+		},
+		"resources": {
+			"primaryDocumentation": [
+				{
+					"url": "https://www.tradingview.com/"
+				}
+			]
+		},
+		"alias": ["TradingView", "trading", "stocks", "market data", "financial data"]
+	}
+}
